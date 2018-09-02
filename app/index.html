@@ -22,6 +22,38 @@
                 <script src="js/html5.js"></script>
         <![endif]-->
 
+        <style>
+            .tv {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  .screen {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+
+    margin: auto;
+
+    opacity: 0;
+    transition: opacity .5s;
+
+    &.active {
+      opacity: 1;
+    }
+  }
+}
+        </style>
+
     </head>
     <body>
 
@@ -39,28 +71,24 @@
             <nav id="header-main-menu">
                 <div class="mob-menu">MENU</div>
                 <ul class="main-menu sm sm-clean">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#portfolio">Portfolio</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#news">News</a></li>
-                    <li><a href="#video">Video</a></li>
-                    <li><a href="#skills">Skills</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#services">sobre</a></li>
+                    <li><a href="#portfolio">musicas</a></li>
+                    <li><a href="#about">contato</a></li>
                 </ul>
             </nav>
         </div>
 
-
-
         <!-- Home -->
 
         <div id="home" class="section intro-page">
-            <div class="block content-1170 center-relative center-text">
-                <img class="top-logo" src="demo-images/logo.png" alt="Boxus" />
-                <br>
-                <h1 class="big-title">Prestensom</h1>
-                <p class="title-desc">Support bright students today for a better tomorrow</p>
+              <div class="tv">
+            <div class="screen mute" id="tv"></div>
+	    </div>
+            <div class="block content-1170 center-relative center-text title-text">
+                "Em pleno <b>bug</b> do milênio
+quando diziam que o <b>mundo</b> iria acabar, o <b>nosso</b> começava.
+<b>Prestensom</b> unifica em seu significado a <b>importância</b> da <b>vibração</b> ​​
+do som com a <b>palavra</b>."
             </div>
         </div>
 
@@ -693,7 +721,8 @@
 
 
         <!--Load JavaScript-->
-        <script type="text/javascript" src="js/jquery.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
         <script type='text/javascript' src='js/jquery.sticky-kit.min.js'></script>
         <script type='text/javascript' src='js/jquery.smartmenus.min.js'></script>
         <script type='text/javascript' src='js/jquery.sticky.js'></script>
@@ -706,5 +735,95 @@
         <script type='text/javascript' src='js/imagesloaded.pkgd.js'></script>
         <script type='text/javascript' src='js/jquery.prettyPhoto.js'></script>
         <script type='text/javascript' src='js/main.js'></script>
+
+
+    <script>
+            var tag = document.createElement('script');
+		tag.src = 'https://www.youtube.com/player_api';
+var firstScriptTag = document.getElementsByTagName('script')[0];
+		firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+var tv;
+var playerDefaults = {loop: 1, autoplay: 1, autohide: 1, modestbranding: 0, rel: 0, showinfo: 0, controls: 0, disablekb: 1, enablejsapi: 0, iv_load_policy: 3};
+
+
+var vid = [
+			{'videoId': 'KOOm9iOgKFQ', 'suggestedQuality': 'default', loop: 1},
+			{'videoId': 'eVFsI8zge6E', 'suggestedQuality': 'default', loop: 1}
+		],
+		randomVid = Math.floor(Math.random() * vid.length),
+    currVid = randomVid;
+
+$('.hi em:last-of-type').html(vid.length);
+
+function onYouTubePlayerAPIReady(){
+  tv = new YT.Player('tv', {events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}, playerVars: playerDefaults});
+}
+
+function onPlayerReady(){
+  tv.loadVideoById(vid[currVid]);
+  tv.mute();
+}
+
+function onStateChange(e) {
+    if (e.data === YT.PlayerState.ENDED) {
+            tv.playVideo();
+        }
+}
+
+function onPlayerStateChange(e) {
+
+if (e.data === YT.PlayerState.ENDED) {
+            tv.playVideo();
+        }
+  if (e.data === 1){
+    $('#tv').addClass('active');
+    $('.hi em:nth-of-type(2)').html(currVid + 1);
+  } else if (e.data === 2){
+    $('#tv').removeClass('active');
+    if(currVid === vid.length - 1){
+      currVid = 0;
+    } else {
+      currVid++;
+    }
+    tv.loadVideoById(vid[currVid]);
+    tv.seekTo(vid[currVid].startSeconds);
+  }
+}
+
+function vidRescale(){
+
+  var w = $(window).width(),
+    h = $(window).height();
+
+  if (w/h > 16/9){
+    tv.setSize(w, w/16*9);
+    $('.tv .screen').css({'left': '0px'});
+  } else {
+    tv.setSize(h/9*16, h);
+    $('.tv .screen').css({'left': -($('.tv .screen').outerWidth()-w)/2});
+  }
+}
+
+$(window).on('load resize', function(){
+  vidRescale();
+});
+
+$('.hi span:first-of-type').on('click', function(){
+  $('#tv').toggleClass('mute');
+  $('.hi em:first-of-type').toggleClass('hidden');
+  if($('#tv').hasClass('mute')){
+    tv.mute();
+  } else {
+    tv.unMute();
+  }
+});
+
+$('.hi span:last-of-type').on('click', function(){
+  $('.hi em:nth-of-type(2)').html('~');
+  tv.pauseVideo();
+});
+
+        </script>
+
     </body>
 </html>
